@@ -45,6 +45,8 @@ USER_APPS = [
 
 THIRD_PARTY_APPS = [
     'rest_framework',
+    "drf_spectacular",
+    'drf_spectacular_sidecar',
 ]
 
 INSTALLED_APPS = CORE_APPS + USER_APPS + THIRD_PARTY_APPS
@@ -138,8 +140,22 @@ REST_FRAMEWORK = {
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ]
+    ],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 USER_PROFILE_REF_CODE_LENGTH = 6
 USER_PROFILE_PHONE_CONFIRMATION_CODE_LENGTH = 4
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Refferal System",
+    "DESCRIPTION": "Refferal System api",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+
+    # self hosting settings
+    'SWAGGER_UI_DIST': 'SIDECAR',  # shorthand to use the sidecar instead
+    'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
+    'REDOC_DIST': 'SIDECAR',
+    # OTHER SETTINGS
+}

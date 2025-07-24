@@ -1,21 +1,36 @@
 from django.http import JsonResponse
-from django.shortcuts import render
 from rest_framework import viewsets
+from drf_spectacular.utils import extend_schema
 
 from user_profile.models import UserProfile
+from user_profile.serializers.UserProfileSerializer import UserProfileSerializer
 
 from user_profile.utils.phone_authentication import authorise, verify_code
 
 
 # Create your views here.
-class UserProfileViewSet(viewsets.ModelViewSet):
+class UserProfileViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = UserProfile.objects.all()
+    serializer_class = UserProfileSerializer
 
-    def list(self, request):
-        pass
+    def get_queryset(self):
+        return UserProfile.objects.filter(user=self.request.user)
 
-    def retrieve(self, request, pk=None):
-        pass
+    @extend_schema(
+        operation_id="all_profiles",   # заменяет название метода
+        summary="all profiles",         # заголовок в ReDoc
+        description="Returns all profiles",
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    @extend_schema(
+        operation_id="profile_detail",
+        summary="Profile detail",
+        description="Returns profile detail by id",
+    )
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
 
     # auth with phone number
     def auth_request(self, request):
