@@ -8,14 +8,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from user_profile.models import UserProfile
-from user_profile.serializers.user_profile_serializer import UserProfileSerializer
+from user_profile.serializers.user_profile_serializer import UserProfileSerializer, ParentReferalSerializer
 from user_profile.serializers.referal_request_serializer import ReferalRequestSerializer
 from user_profile.serializers.authorization_serializer import AuthorizationSerializer
 
 from user_profile.utils.phone_authentication import authorise, verify_code
-
-from user_profile.utils.referal_code import check_referal_code
-
 
 class AuthRequestView(viewsets.ViewSet):
     @extend_schema(
@@ -80,16 +77,17 @@ class UserProfileViewSet(viewsets.ReadOnlyModelViewSet):
     )
     @action(detail=False, methods=["POST"])
     def input_referal_code(self, request):
-        code = request.data.get('code')
-        try:
-            check_referal_code(code)
-        except Exception as e:
-            return JsonResponse({'error':'Invalid referal code'},status=400)
+        serializer = ReferalRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
+        code_profile = serializer.context['profile']
+        current_user_profile = UserProfile.objects.get(user=request.user)
 
-
-        # for authenticated user only
-        # can activate only one code, else - error
-        raise NotImplementedError("Логика проверки кода ещё не реализована")
-
+        serializer = ParentReferalSerializer(
+            instance=current_user_profile,
+            data={},
+            context={'profile': code_profile}
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
 

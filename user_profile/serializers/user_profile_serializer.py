@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
+
 from user_profile.models import UserProfile
 
 
@@ -27,3 +29,32 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'referal_number',
             'child_referals',
         ]
+
+
+class ParentReferalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = ['parent_referal']
+
+    def validate(self, attrs):
+        """
+        Общая валидация: проверяем, можно ли назначить родителя
+        """
+        code_profile = self.context['profile']
+
+        if self.instance.parent_referal:
+            raise ValidationError(
+                {"parent_referal": "You have already activated referal code"}
+            )
+
+        if code_profile == self.instance:
+            raise ValidationError(
+                {"parent_referal": "You can't activate yours referal code"}
+            )
+        attrs['parent_referal'] = code_profile
+        return attrs
+
+    def update(self, instance, validated_data):
+        instance.parent_referal = validated_data['parent_referal']
+        instance.save()
+        return instance
