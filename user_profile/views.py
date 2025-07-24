@@ -3,10 +3,9 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 
 from drf_spectacular.utils import extend_schema
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import IsAuthenticated
 
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.exceptions import AuthenticationFailed
 
 from user_profile.models import UserProfile
 from user_profile.serializers.user_profile_serializer import UserProfileSerializer
@@ -14,6 +13,8 @@ from user_profile.serializers.referal_request_serializer import ReferalRequestSe
 from user_profile.serializers.authorization_serializer import AuthorizationSerializer
 
 from user_profile.utils.phone_authentication import authorise, verify_code
+
+from user_profile.utils.referal_code import check_referal_code
 
 
 class AuthRequestView(viewsets.ViewSet):
@@ -36,11 +37,8 @@ class AuthRequestView(viewsets.ViewSet):
             user = profile.user
             refresh = RefreshToken.for_user(user)
             return JsonResponse({
-                'refresh': str(refresh),
-                'access': str(refresh.access_token),
+                'token': str(refresh.access_token),
             })
-            # create token for user
-            # return get auth token
         profile, sent_code = authorise(phone)
         return JsonResponse({
             'phone': phone,
@@ -51,6 +49,7 @@ class AuthRequestView(viewsets.ViewSet):
 class UserProfileViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         if self.request.user.is_superuser:
@@ -81,6 +80,14 @@ class UserProfileViewSet(viewsets.ReadOnlyModelViewSet):
     )
     @action(detail=False, methods=["POST"])
     def input_referal_code(self, request):
+        code = request.data.get('code')
+        try:
+            check_referal_code(code)
+        except Exception as e:
+            return JsonResponse({'error':'Invalid referal code'},status=400)
+
+
+
         # for authenticated user only
         # can activate only one code, else - error
         raise NotImplementedError("Логика проверки кода ещё не реализована")

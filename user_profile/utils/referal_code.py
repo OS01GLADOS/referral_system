@@ -1,0 +1,15 @@
+from user_profile.models import UserProfile
+
+
+def check_referal_code(code: str) -> UserProfile:
+    """
+    Checks if the code is valid.
+    returns profile, which code belongs to.
+
+    :param code:
+    :return: UserProfile
+    """
+    code = code.replace(' ', '')
+    if code and code != "":
+        return UserProfile.objects.get(referal_number__iexact=code)
+    raise ValueError('code is empty')
