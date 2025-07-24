@@ -14,11 +14,13 @@ class UserProfileViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = UserProfileSerializer
 
     def get_queryset(self):
+        if self.request.user.is_superuser:
+            return UserProfile.objects.all()
         return UserProfile.objects.filter(user=self.request.user)
 
     @extend_schema(
-        operation_id="all_profiles",   # заменяет название метода
-        summary="all profiles",         # заголовок в ReDoc
+        operation_id="all_profiles",
+        summary="all profiles",
         description="Returns all profiles",
     )
     def list(self, request, *args, **kwargs):

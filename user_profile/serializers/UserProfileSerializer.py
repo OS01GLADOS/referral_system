@@ -15,7 +15,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     child_referals = serializers.SerializerMethodField()
 
-    def get_child_referals(self, obj):
+    def get_child_referals(self, obj) -> ChildUserProfileSerializer(many=True):
         children = UserProfile.objects.filter(parent_referal=obj)
         return ChildUserProfileSerializer(children, many=True).data
 
