@@ -2,7 +2,7 @@ from django.http import JsonResponse
 from rest_framework import viewsets
 from rest_framework.decorators import action
 
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, OpenApiResponse, inline_serializer
 from rest_framework.permissions import IsAuthenticated
 
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -10,7 +10,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from user_profile.models import UserProfile
 from user_profile.serializers.user_profile_serializer import UserProfileSerializer, ParentReferalSerializer
 from user_profile.serializers.referal_request_serializer import ReferalRequestSerializer
-from user_profile.serializers.authorization_serializer import AuthorizationSerializer
+from user_profile.serializers.authorization_serializer import AuthorizationSerializer, AuthorizationReqestSerializer, TokenSerializer
 
 from user_profile.utils.phone_authentication import authorise, verify_code
 
@@ -18,29 +18,54 @@ class AuthRequestView(viewsets.ViewSet):
     @extend_schema(
         operation_id="phone_authentication",
         summary="phone authentication",
-        description="Returns all profiles",
-        request=AuthorizationSerializer,
+        description="Allows authentication with phone number",
+        request=AuthorizationReqestSerializer,
+        responses={
+            200: OpenApiResponse(
+                response=AuthorizationSerializer,
+                description="user was created, confirmation code was sent"
+
+            )
+        },
     )
     @action(detail=False, methods=["POST"])
     def phone(self, request):
+        serializer = AuthorizationReqestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        phone = serializer.validated_data.get('phone_number')
+        profile, sent_code = authorise(phone)
+        return JsonResponse({
+            'phone_number': phone,
+            'code': sent_code,
+        })
+
+    @extend_schema(
+        operation_id="phone_authentication_confirm",
+        summary="phone authentication confirmation",
+        description="Confirms authentication with phone number",
+        request=AuthorizationSerializer,
+        responses={
+            200: OpenApiResponse(
+                response=TokenSerializer,
+                description="phone confirmed successfully"
+            ),
+        },
+    )
+    @action(detail=False, methods=["POST"])
+    def phone_confirm(self, request):
         serializer = AuthorizationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         phone = serializer.validated_data.get('phone_number')
         code = serializer.validated_data.get('code')
-
-        if code:
-            profile = verify_code(phone, code)
-            user = profile.user
-            refresh = RefreshToken.for_user(user)
-            return JsonResponse({
-                'token': str(refresh.access_token),
-            })
-        profile, sent_code = authorise(phone)
+        profile = verify_code(phone, code)
+        user = profile.user
+        refresh = RefreshToken.for_user(user)
         return JsonResponse({
-            'phone': phone,
-            'code': sent_code,
+            'token': str(refresh.access_token),
         })
+
 
 
 class UserProfileViewSet(viewsets.ReadOnlyModelViewSet):
@@ -90,4 +115,6 @@ class UserProfileViewSet(viewsets.ReadOnlyModelViewSet):
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
+
+        return JsonResponse(UserProfileSerializer(current_user_profile).data)
 

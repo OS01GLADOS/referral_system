@@ -35,11 +35,5 @@ urlpatterns = [
         "api/v1/schema/redoc/",
         SpectacularRedocView.as_view(url_name="schema"),
         name="redoc",
-    ),
-
-    path(
-        "api/v1/schema/swagger/",
-        SpectacularSwaggerView.as_view(url_name="schema"),
-        name="swagger",
-    ),
+    )
 ]
