@@ -1,11 +1,44 @@
 from django.http import JsonResponse
 from rest_framework import viewsets
+from rest_framework.decorators import action
+
 from drf_spectacular.utils import extend_schema
+from rest_framework.permissions import AllowAny
 
 from user_profile.models import UserProfile
-from user_profile.serializers.UserProfileSerializer import UserProfileSerializer
+from user_profile.serializers.user_profile_serializer import UserProfileSerializer
+from user_profile.serializers.referal_request_serializer import ReferalRequestSerializer
+from user_profile.serializers.authorization_serializer import AuthorizationSerializer
 
 from user_profile.utils.phone_authentication import authorise, verify_code
+
+
+class AuthRequestView(viewsets.ViewSet):
+    permission_classes = [AllowAny]
+    @extend_schema(
+        operation_id="phone_authentication",
+        summary="phone authentication",
+        description="Returns all profiles",
+        request=AuthorizationSerializer,
+    )
+    @action(detail=False, methods=["POST"])
+    def phone(self, request):
+        serializer = AuthorizationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        phone = serializer.validated_data.get('phone_number')
+        code = serializer.validated_data.get('code')
+
+        if code:
+            profile = verify_code(phone, code)  # возвращает UserProfile или выбрасывает ValidationError
+            user = profile.user
+            raise NotImplementedError("Логика проверки кода ещё не реализована")
+            # return get auth token
+        profile, sent_code = authorise(phone)
+        return JsonResponse({
+            'phone': phone,
+            'code': sent_code,
+        })
 
 
 # Create your views here.
@@ -28,33 +61,22 @@ class UserProfileViewSet(viewsets.ReadOnlyModelViewSet):
 
     @extend_schema(
         operation_id="profile_detail",
-        summary="Profile detail",
+        summary="profile detail",
         description="Returns profile detail by id",
     )
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
 
-    # auth with phone number
-    def auth_request(self, request):
-        request_json = {}
-        phone = request_json.get('phone_number')
-        code = request_json.get('code', None)
-        if code:
-            profile = verify_code(phone, code)  # возвращает UserProfile или выбрасывает ValidationError
-            user = profile.user
-            raise NotImplementedError("Логика проверки кода ещё не реализована")
-            # return get auth token
-        profile, sent_code = authorise(phone)
-        return JsonResponse({
-            'phone': phone,
-            'code': sent_code,
-        })
-
-
-    # input referal number
+    @extend_schema(
+        operation_id="input_referal_code",
+        summary="input referal code",
+        description="Set referal code for currently logged in user",
+        request=ReferalRequestSerializer,
+    )
+    @action(detail=False, methods=["POST"])
     def input_referal_code(self, request):
         # for authenticated user only
         # can activate only one code, else - error
-        pass
+        raise NotImplementedError("Логика проверки кода ещё не реализована")
 
 

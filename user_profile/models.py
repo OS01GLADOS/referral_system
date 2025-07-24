@@ -1,11 +1,14 @@
 from django.db import models
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from core.code_generator import generate
+
+User = get_user_model()
 
 
 # Create your models here.
 class UserProfile(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone_number = models.CharField(max_length=12, unique=True)
 
     referal_number = models.CharField(max_length=6, null=True, blank=True)
@@ -18,4 +21,3 @@ class UserProfile(models.Model):
         super().__init__(*args, **kwarg)
         if not self.referal_number:
             self.referal_number = generate(settings.USER_PROFILE_REF_CODE_LENGTH)
-            self.save()
