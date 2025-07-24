@@ -5,6 +5,9 @@ from rest_framework.decorators import action
 from drf_spectacular.utils import extend_schema
 from rest_framework.permissions import AllowAny
 
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.exceptions import AuthenticationFailed
+
 from user_profile.models import UserProfile
 from user_profile.serializers.user_profile_serializer import UserProfileSerializer
 from user_profile.serializers.referal_request_serializer import ReferalRequestSerializer
@@ -14,7 +17,6 @@ from user_profile.utils.phone_authentication import authorise, verify_code
 
 
 class AuthRequestView(viewsets.ViewSet):
-    permission_classes = [AllowAny]
     @extend_schema(
         operation_id="phone_authentication",
         summary="phone authentication",
@@ -30,9 +32,14 @@ class AuthRequestView(viewsets.ViewSet):
         code = serializer.validated_data.get('code')
 
         if code:
-            profile = verify_code(phone, code)  # возвращает UserProfile или выбрасывает ValidationError
+            profile = verify_code(phone, code)
             user = profile.user
-            raise NotImplementedError("Логика проверки кода ещё не реализована")
+            refresh = RefreshToken.for_user(user)
+            return JsonResponse({
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+            })
+            # create token for user
             # return get auth token
         profile, sent_code = authorise(phone)
         return JsonResponse({
@@ -41,7 +48,6 @@ class AuthRequestView(viewsets.ViewSet):
         })
 
 
-# Create your views here.
 class UserProfileViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
