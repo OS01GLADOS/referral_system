@@ -8,6 +8,7 @@ django = "*"
 djangorestframework = "*"
 drf-spectacular = {extras = ["sidecar"], version = "*"}
 djangorestframework-simplejwt = "*"
+psycopg2-binary = "*"
 
 [dev-packages]
 pytest = "*"

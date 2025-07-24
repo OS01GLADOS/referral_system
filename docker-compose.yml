@@ -7,3 +7,27 @@ services:
       - 80:8000
     volumes:
       - ./referal_system:/app
+    depends_on:
+      - db
+    environment:
+      # переменные окружения для подключения к базе
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: referal_db
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: referal_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:
