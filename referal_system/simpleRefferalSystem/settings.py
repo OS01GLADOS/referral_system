@@ -43,7 +43,8 @@ CORE_APPS = [
 ]
 
 USER_APPS = [
-    'user_profile'
+    'user_profile',
+    'ui',
 ]
 
 THIRD_PARTY_APPS = [

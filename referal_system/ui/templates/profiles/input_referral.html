@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Реферальный код</title>
+</head>
+<body>
+<h1>Ввод реферального кода</h1>
+<input type="text" id="code" placeholder="Введите код">
+<button onclick="sendCode()">Отправить</button>
+
+<script>
+    const referral_code_fetch = '/api/v1/users/input_referal_code/'
+
+function sendCode() {
+    const code = document.getElementById('code').value;
+    fetch(referral_code_fetch, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+        },
+        body: JSON.stringify({code: code})
+    })
+    .then(r => r.json())
+    .then(data => {
+        alert('Код успешно активирован!');
+        console.log(data);
+    });
+}
+</script>
+</body>
+</html>

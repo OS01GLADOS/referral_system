@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Профили</title>
+</head>
+<body>
+<h1>Все профили</h1>
+<ul id="profiles-list"></ul>
+
+<script>
+    const users_fetch = '/api/v1/users/'
+    const profileBaseUrl = "{% url 'profile_detail' 0 %}".replace('/0/', '');
+
+fetch(users_fetch, {
+    headers: {'Authorization': 'Bearer '+localStorage.getItem('token')}
+})
+.then(r => r.json())
+.then(data => {
+    const list = document.getElementById('profiles-list');
+    data.forEach(profile => {
+        const li = document.createElement('li');
+        li.innerHTML = `<a href=${profileBaseUrl}/${profile.id}/>${profile.phone_number}</a>`;
+        list.appendChild(li);
+    });
+});
+</script>
+</body>
+</html>

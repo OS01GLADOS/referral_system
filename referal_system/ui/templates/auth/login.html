@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Авторизация</title>
+</head>
+<body>
+<h1>Авторизация по номеру телефона</h1>
+<p id="response"></p>
+
+<!-- Шаг 1: отправляем номер -->
+<div id="step1">
+    <input type="text" id="phone" placeholder="Введите номер телефона">
+    <button onclick="sendPhone()">Отправить номер</button>
+</div>
+
+<!-- Шаг 2: подтверждение -->
+<div id="step2" style="display:none;">
+    <input type="text" id="code" placeholder="Введите код">
+    <button onclick="confirmCode()">Подтвердить</button>
+</div>
+
+<script>
+let phoneNumber = '';
+
+const phone_url = '/api/v1/authorisation/phone/';
+const phone_confirm_url = '/api/v1/authorisation/phone_confirm/';
+
+const nextWindow = "{% url 'profiles' %}";
+
+
+function sendPhone() {
+    phoneNumber = document.getElementById('phone').value;
+    fetch(phone_url, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({phone_number: phoneNumber})
+    })
+    .then(r => r.json())
+    .then(data => {
+        document.getElementById('response').innerText = "код подтверждения: "+data.code;
+        document.getElementById('step1').style.display = 'none';
+        document.getElementById('step2').style.display = 'block';
+    });
+}
+
+function confirmCode() {
+    const code = document.getElementById('code').value;
+    fetch(phone_confirm_url, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({phone_number: phoneNumber, code: code})
+    })
+    .then(r => r.json())
+    .then(data => {
+        localStorage.setItem('token', data.token);
+        alert('Успешно авторизовано!');
+        window.location.href = nextWindow;
+    });
+}
+</script>
+</body>
+</html>
