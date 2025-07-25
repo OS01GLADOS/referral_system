@@ -3,6 +3,9 @@
 ## документация есть в документе Redoc
 `/api/v1/schema/redoc/`
 
+## простой UI на django templates
+`/ui/login`
+
 ## postman collection
 
 [click here](https://www.postman.com/ds-8809303/simplereferralapi/collection/t1rvu2c/referral-system)
