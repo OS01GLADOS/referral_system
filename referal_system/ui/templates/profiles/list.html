@@ -1,9 +1,9 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Профили</title>
-</head>
-<body>
+{% extends "base.html" %}
+
+{% block title %}Профили{% endblock %}
+
+
+{% block content %}
 <h1>Все профили</h1>
 <ul id="profiles-list"></ul>
 
@@ -24,5 +24,4 @@ fetch(users_fetch, {
     });
 });
 </script>
-</body>
-</html>
+{% endblock %}

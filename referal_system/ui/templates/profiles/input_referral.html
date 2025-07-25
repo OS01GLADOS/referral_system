@@ -1,10 +1,11 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Реферальный код</title>
-</head>
-<body>
-<h1>Ввод реферального кода</h1>
+{% extends "base.html" %}
+
+{% block title %}Реферальный код{% endblock %}
+
+
+{% block content %}
+
+    <h1>Ввод реферального кода</h1>
 <input type="text" id="code" placeholder="Введите код">
 <button onclick="sendCode()">Отправить</button>
 
@@ -28,5 +29,5 @@ function sendCode() {
     });
 }
 </script>
-</body>
-</html>
+
+{% endblock %}
