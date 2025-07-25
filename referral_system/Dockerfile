@@ -26,4 +26,4 @@ COPY --from=compile-image /opt/venv /opt/venv
 # Make sure scripts in .local are usable:
 WORKDIR /app
 ENV PATH="/opt/venv/bin:$PATH"
-CMD ["sh", "entrypoint.sh"]
+CMD ["sh", "./entrypoint.sh"]
