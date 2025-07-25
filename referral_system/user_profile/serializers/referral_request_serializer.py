@@ -2,10 +2,10 @@ from rest_framework import serializers
 
 from user_profile.models import UserProfile
 
-from user_profile.utils.referal_code import check_referal_code
+from user_profile.utils.referral_code import check_referral_code
 
 
-class ReferalRequestSerializer(serializers.Serializer):
+class ReferralRequestSerializer(serializers.Serializer):
     code = serializers.CharField()
 
     def validate_code(self, value):

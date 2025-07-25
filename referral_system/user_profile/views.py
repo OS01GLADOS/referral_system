@@ -9,7 +9,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from user_profile.models import UserProfile
 from user_profile.serializers.user_profile_serializer import UserProfileSerializer, ParentReferalSerializer
-from user_profile.serializers.referal_request_serializer import ReferalRequestSerializer
+from user_profile.serializers.referral_request_serializer import ReferralRequestSerializer
 from user_profile.serializers.authorization_serializer import AuthorizationSerializer, AuthorizationReqestSerializer, TokenSerializer
 
 from user_profile.utils.phone_authentication import authorise, verify_code
@@ -67,7 +67,6 @@ class AuthRequestView(viewsets.ViewSet):
         })
 
 
-
 class UserProfileViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
@@ -98,11 +97,11 @@ class UserProfileViewSet(viewsets.ReadOnlyModelViewSet):
         operation_id="input_referal_code",
         summary="input referal code",
         description="Set referal code for currently logged in user",
-        request=ReferalRequestSerializer,
+        request=ReferralRequestSerializer,
     )
     @action(detail=False, methods=["POST"])
-    def input_referal_code(self, request):
-        serializer = ReferalRequestSerializer(data=request.data)
+    def input_referral_code(self, request):
+        serializer = ReferralRequestSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         code_profile = serializer.context['profile']

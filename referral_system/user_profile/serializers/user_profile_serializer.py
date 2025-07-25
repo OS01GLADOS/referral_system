@@ -15,10 +15,10 @@ class ChildUserProfileSerializer(serializers.ModelSerializer):
 
 class UserProfileSerializer(serializers.ModelSerializer):
 
-    child_referals = serializers.SerializerMethodField()
+    child_referrals = serializers.SerializerMethodField()
 
-    def get_child_referals(self, obj) -> ChildUserProfileSerializer(many=True):
-        children = UserProfile.objects.filter(parent_referal=obj)
+    def get_child_referrals(self, obj) -> ChildUserProfileSerializer(many=True):
+        children = UserProfile.objects.filter(parent_referral=obj)
         return ChildUserProfileSerializer(children, many=True).data
 
     class Meta:
@@ -26,15 +26,15 @@ class UserProfileSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'phone_number',
-            'referal_number',
-            'child_referals',
+            'referral_number',
+            'child_referrals',
         ]
 
 
 class ParentReferalSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
-        fields = ['parent_referal']
+        fields = ['parent_referral']
 
     def validate(self, attrs):
         """
@@ -42,19 +42,19 @@ class ParentReferalSerializer(serializers.ModelSerializer):
         """
         code_profile = self.context['profile']
 
-        if self.instance.parent_referal:
+        if self.instance.parent_referral:
             raise ValidationError(
-                {"parent_referal": "You have already activated referal code"}
+                {"parent_referral": "You have already activated referal code"}
             )
 
         if code_profile == self.instance:
             raise ValidationError(
-                {"parent_referal": "You can't activate yours referal code"}
+                {"parent_referral": "You can't activate yours referal code"}
             )
-        attrs['parent_referal'] = code_profile
+        attrs['parent_referral'] = code_profile
         return attrs
 
     def update(self, instance, validated_data):
-        instance.parent_referal = validated_data['parent_referal']
+        instance.parent_referral = validated_data['parent_referral']
         instance.save()
         return instance

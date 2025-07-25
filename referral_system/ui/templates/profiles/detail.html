@@ -22,9 +22,9 @@ fetch(profiles_get, {
     document.getElementById('profile').innerHTML = `
         <p>ID: ${data.id}</p>
         <p>Телефон: ${data.phone_number}</p>
-        <p>Реферальный код: ${data.referal_number}</p>
+        <p>Реферальный код: ${data.referral_number}</p>
         <p>Уже активировали код:</p>
-        <ul>${data.child_referals.map(ch => `<li>${ch.phone_number}</li>`).join('')}</ul>
+        <ul>${data.child_referrals.map(ch => `<li>${ch.phone_number}</li>`).join('')}</ul>
         <a href=${input_referral_code}>активировать реферальный код</a>
     `;
 });

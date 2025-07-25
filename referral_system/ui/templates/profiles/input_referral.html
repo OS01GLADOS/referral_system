@@ -22,11 +22,21 @@ function sendCode() {
         },
         body: JSON.stringify({code: code})
     })
-    .then(r => r.json())
-    .then(data => {
-        alert('Код успешно активирован!');
-        console.log(data);
-    });
+.then(response => {
+    if (!response.ok) {
+        // Сервер вернул ошибку (например, 400 или 500)
+        throw new Error('Ошибка активации: ' + response.status);
+    }
+    return response.json();
+})
+.then(data => {
+    alert('Код успешно активирован!');
+    console.log(data);
+})
+.catch(error => {
+    alert('Не удалось активировать код. Попробуйте снова.');
+    console.error('Ошибка:', error);
+});
 }
 </script>
 

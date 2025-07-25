@@ -3,6 +3,13 @@
 ## документация есть в документе Redoc
 `/api/v1/schema/redoc/`
 
+## postman collection
+
+[click here](https://www.postman.com/ds-8809303/simplereferralapi/collection/t1rvu2c/referral-system)
+or paste it:
+```
+https://www.postman.com/ds-8809303/simplereferralapi/collection/t1rvu2c/referral-system
+```
 ## Эндпоинты
 
 ---
@@ -58,8 +65,8 @@
   {
     "id": 0,
     "phone_number": "string",
-    "referal_number": "string",
-    "child_referals": []
+    "referral_number": "string",
+    "child_referrals": []
   }
 ]
 ```
@@ -71,12 +78,13 @@
 
 **Request:** `GET`  
 
-**Response:** `200 OK`  
+**Response:** `200 OK`
+
 ```json
 {
   "id": 0,
   "phone_number": "string",
-  "referal_number": "string",
+  "referral_number": "string",
   "child_referals": [
     {
       "id": 0,
@@ -98,12 +106,13 @@
 }
 ```
 
-**Response:** `200 OK`  
+**Response:** `200 OK`
+
 ```json
 {
   "id": 0,
   "phone_number": "string",
-  "referal_number": "string",
+  "referral_number": "string",
   "child_referals": [
     {
       "id": 0,

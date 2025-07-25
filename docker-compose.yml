@@ -1,15 +1,16 @@
 services:
   api:
     build:
-      context: ./referal_system
+      context: ./referral_system
       dockerfile: Dockerfile
     ports:
       - 80:8000
     volumes:
-      - ./referal_system:/app
+      - ./referral_system:/app
     depends_on:
       - db
     environment:
+      DEBUG: 0
       # переменные окружения для подключения к базе
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
